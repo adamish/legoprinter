@@ -1,0 +1,31 @@
+<project name="legoprintersrc" default="all" basedir=".">
+
+  <target name="all" depends="source_zip,build,install" />
+
+  <target name="source_zip" description="build source zip file">
+    <zip destfile="legoprinter-src.zip" excludes="**">
+      <zipfileset file="build.xml" />
+      <zipfileset file="cups_backend/lego110" prefix="cups_backend"/>
+      <zipfileset dir="serial_driver" prefix="serial_driver" excludes="**/*.class,bin/*,lego110.jar"  />
+      <zipfileset file="firmware/lego100/lego100.pde" prefix="firmware"/>
+    </zip>
+  </target>
+
+  <target name="build">
+    <ant dir="serial_driver" target="all" />
+  </target>
+
+  <property name="install.dir" value="/usr/libexec/cups/backend/lego110driver" />
+  <property name="cups_backend" value="/usr/libexec/cups/backend" />
+
+  <target name="install">
+    <copy file="cups_backend/lego110" todir="${cups_backend}" />
+    <exec executable="chmod">
+      <arg line="a+x ${cups_backend}/lego110" />
+    </exec>
+    <mkdir dir="${install.dir}" />
+    <copy file="serial_driver/lego110.jar" todir="${install.dir}" />
+    <copy file="serial_driver/rxtx-2.2pre2/RXTXcomm.jar" todir="${install.dir}" />
+  </target>
+
+</project>

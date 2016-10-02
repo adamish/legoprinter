@@ -1,0 +1,18 @@
+<project name="legoprinter110" default="all" basedir=".">
+
+	<target name="all" depends="compile, archive" />
+	
+	<property name="build.tmp" value="build.tmp" />
+	<property name="build.output" value="lego110.jar" />
+
+	<target name="compile" description="compile the java source">
+		<mkdir dir="${build.tmp}" />
+		<javac srcdir="src/" classpath="rxtx-2.2pre2/RXTXcomm.jar" destdir="${build.tmp}" />
+
+	</target>
+
+	<target name="archive" description="make jar file">
+		<zip destfile="${build.output}" basedir="${build.tmp}">
+		</zip>
+	</target>
+</project>

@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# This file is part of lego110.
+#
+#  Lego110 is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  Lego110 is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with lego110.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+if [ ! "$1" == "" ]; then
+
+  # Standard args passed by CUPS
+  id=$1
+  user=$2
+  title=$3
+  copies=$4
+  opt=$5
+  file=$6
+
+  echo "Printing..." > backend.log
+  echo "id     = $id" >> backend.log
+  echo "user   = $user" >> backend.log
+  echo "title  = $title" >> backend.log
+  echo "copies = $copies" >> backend.log
+  echo "opt    = $opt" >> backend.log
+  echo "file   = $file" >> backend.log
+
+  # work in a temp directory
+  tmp=$( mktemp -d -t lego )
+  cd $tmp
+
+  # Redirect the piped postscript to a file
+  cat /dev/stdin > print.ps
+
+  # ImageMagik the postscript to png.
+  export PATH=/opt/local/bin:$PATH
+  convert print.ps print.png &> backend.log
+
+  cp=/usr/libexec/cups/backend/lego110driver
+  /usr/bin/java -Dhorse.pwd=$PWD -Djava.awt.headless=true -cp $cp/lego110.jar:$cp/RXTXcomm.jar com.adamish.lego110.Main *.png >> backend.log
+
+else
+  # CUPS printer discovery 
+  echo "direct lego110://horse \"Lego felt tip 110\" \"Lego felt tip 110\"";
+fi
